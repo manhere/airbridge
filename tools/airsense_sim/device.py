@@ -131,7 +131,7 @@ STORED_TAGS = ("ABR", "TXC", "TXH", "TXE", "TXW", "TRR", "DLL", "ERR", "ELI", "Z
 # Custom-settings registry records (protocol version 02).
 CSG_RECORDS = (
     "V4 04 00000FFF IPC 0032 0001 01 05:cmH2O 01 03:Set Set Pressure",
-    "V4 00 00000FFF MPA 0001 0001 00 00: 00 Max Pressure",
+    "V4 00 00000FFF MPA 0001 0001 00 05:cmH2O 00 Max Pressure",
     "V8 02 00000FFF EBE 01 07:Comfort Easy-Breathe",
 )
 
