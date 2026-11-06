@@ -3707,7 +3707,10 @@ function loadSettings(force = false) {
             section = document.createElement('section');
             section.className = 'setting-group';
             const heading = document.createElement('h4');
-            heading.textContent = name;
+            // Group names arrive from the device's CSG registry ("Set",
+            // "Comfort"); translate the known ones and fall back to the raw
+            // name for anything this build has no key for.
+            uiText(heading, uiMessage('clinical.group.' + name, {}, name));
             section.appendChild(heading);
             parent.appendChild(section);
             groups.set(key, section);

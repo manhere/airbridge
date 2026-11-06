@@ -32,6 +32,8 @@
   "clinical.accessories": "Akcesoria",
   "clinical.comfort": "Komfort",
   "clinical.configuration": "Konfiguracja",
+  "clinical.group.Comfort": "Komfort",
+  "clinical.group.Set": "Ustawienie",
   "clinical.invalid": "Nieprawidłowa wartość: {key}",
   "clinical.keptDrafts": "Nie zastosowano nowych odczytów: zachowano niezapisane zmiany",
   "clinical.label.ACC": "Dostęp pacjenta",

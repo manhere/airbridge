@@ -32,6 +32,8 @@
   "clinical.accessories": "附件",
   "clinical.comfort": "舒适度",
   "clinical.configuration": "配置",
+  "clinical.group.Comfort": "舒适",
+  "clinical.group.Set": "设置",
   "clinical.invalid": "无效值：{key}",
   "clinical.keptDrafts": "未应用新读数：保留未保存修改",
   "clinical.label.ACC": "患者菜单",

@@ -32,6 +32,8 @@
   "clinical.accessories": "Accessories",
   "clinical.comfort": "Comfort",
   "clinical.configuration": "Configuration",
+  "clinical.group.Comfort": "Comfort",
+  "clinical.group.Set": "Set",
   "clinical.invalid": "Invalid value: {key}",
   "clinical.keptDrafts": "New readings not applied: unsaved changes kept",
   "clinical.label.ACC": "Patient Access",
