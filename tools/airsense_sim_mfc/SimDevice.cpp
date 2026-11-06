@@ -62,14 +62,22 @@ const std::vector<std::string> kStoredTags = {
 // numeric variables (the firmware queries G C #VAR for their limits).
 // Pressure settings use 0.1 cmH2O resolution: scale=10, decimals=1, step=5 (=0.5 cmH2O).
 const std::vector<std::string> kCsgRecords = {
-    "V4 04 00000FFF IPC 000A 0005 01 05:cmH2O 01 03:Set Set Pressure",
-    // MPA/MPI carry the "auto" mode mask 00000806 (bits 1,2,11 = AutoSet/APAP/
-    // AutoSet Her): they are the APAP pressure pair, so they must not appear in
-    // fixed-pressure modes. Both go through the registry so they reach the UI
-    // with their cmH2O unit -- the stock catalogue carries no units at all.
+    // Token 2 is the CATEGORY (index into GROUPS[] in src/clinical_settings.cpp:
+    // 0 therapy, 1 comfort, 2 accessories, 3 options, 4 configuration) and the
+    // trailing "NN 0L:name" is the sub-group path rendered as a nested section.
+    // Both must agree with the firmware's MODE_LAYOUT: IPC is a CPAP therapy
+    // parameter, EBE is a comfort feature of the S mode.
+    //
+    // CPAP only; therapy card, nested under "Set".
+    "V4 00 00000001 IPC 000A 0005 01 05:cmH2O 01 03:Set Set Pressure",
+    // MPA/MPI carry mask 00000806 (bits 1,2,11 = AutoSet/APAP/AutoSet Her):
+    // they are the APAP pressure pair and must not appear in fixed-pressure
+    // modes. All three go through the registry so they reach the UI with their
+    // cmH2O unit -- the stock catalogue carries no units at all.
     "V4 00 00000806 MPA 000A 0005 01 05:cmH2O 00 Max Pressure",
     "V4 00 00000806 MPI 000A 0005 01 05:cmH2O 00 Min Pressure",
-    "V8 02 00000FFF EBE 01 07:Comfort Easy-Breathe",
+    // S mode only; comfort card, nested under "Comfort".
+    "V8 01 00000008 EBE 01 07:Comfort Easy-Breathe",
 };
 
 // Believable demo values: (raw value, raw minimum, raw maximum) on the wire.

@@ -157,16 +157,27 @@ SCHEMAS = {
 STORED_TAGS = ("ABR", "TXC", "TXH", "TXE", "TXW", "TRR", "DLL", "ERR", "ELI", "ZRL")
 
 # Custom-settings registry records (protocol version 02).
-# Pressure settings use 0.1 cmH2O resolution: scale=10, decimals=1, step=5 (=0.5 cmH2O).
-# MPA/MPI carry the "auto" mode mask 00000806 (bits 1,2,11 = AutoSet/APAP/
+#
+# The second token is the CATEGORY (index into GROUPS[] in
+# src/clinical_settings.cpp: 0 therapy, 1 comfort, 2 accessories, 3 options,
+# 4 configuration); the trailing "NN 0L:name" is the sub-group path rendered
+# as a nested section. Both must agree with the firmware's own MODE_LAYOUT:
+# IPC is a CPAP therapy parameter, EBE is a comfort feature of the S mode --
+# filing them under configuration/accessories (as an earlier revision did)
+# pushed them to the wrong card and the wrong nesting level.
+#
+# Pressure settings use 0.1 cmH2O resolution: scale=10, decimals=1, step=5
+# (=0.5 cmH2O). MPA/MPI carry mask 00000806 (bits 1,2,11 = AutoSet/APAP/
 # AutoSet Her): they are the APAP pressure pair, so they must not appear in
-# fixed-pressure modes. Both are delivered through the registry so they reach
-# the UI with their cmH2O unit -- the stock catalogue carries no units at all.
+# fixed-pressure modes. All numeric ones go through the registry so they
+# reach the UI with their cmH2O unit -- the stock table has no unit column.
 CSG_RECORDS = (
-    "V4 04 00000FFF IPC 000A 0005 01 05:cmH2O 01 03:Set Set Pressure",
+    # CPAP only; therapy card, nested under "Set".
+    "V4 00 00000001 IPC 000A 0005 01 05:cmH2O 01 03:Set Set Pressure",
     "V4 00 00000806 MPA 000A 0005 01 05:cmH2O 00 Max Pressure",
     "V4 00 00000806 MPI 000A 0005 01 05:cmH2O 00 Min Pressure",
-    "V8 02 00000FFF EBE 01 07:Comfort Easy-Breathe",
+    # S mode only; comfort card, nested under "Comfort".
+    "V8 01 00000008 EBE 01 07:Comfort Easy-Breathe",
 )
 
 # Believable demo values: (raw value, raw minimum, raw maximum) on the wire.
