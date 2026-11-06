@@ -349,7 +349,12 @@ std::vector<qf::Bytes> CSimDevice::CmdStoredValue(const std::string& command)
         || !IsHex(parts[3]) || parts[3].size() != 4 || !IsHex(parts[4]))
         return { Error(command, "6034") };
     std::string name = parts[2].substr(1);
-    std::vector<int> samples = (name == "AHI") ? std::vector<int>{ 23 } : std::vector<int>{ 10, 20 };
+    // 日报表字段每天恰好 1 个样本（sleep_report.cpp 拒绝 sample_count != 1）；
+    // ONT/OFT 是每天多次治疗时段，合法返回多个。
+    std::vector<int> samples;
+    if (name == "ONT" || name == "OFT")      samples = { 8, 32 };
+    else if (name == "AHI")                  samples = { 23 };
+    else                                     samples = { 10 };
     std::string value = "FFFF" + qf::ToUpperHex(static_cast<unsigned>(samples.size()), 2);
     for (int sample : samples) value += qf::ToUpperHex(static_cast<unsigned>(sample), 4);
     value += "FFFF";

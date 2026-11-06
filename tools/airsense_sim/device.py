@@ -426,7 +426,13 @@ class Device:
         if not match:
             return [self._error(command, "6034")]
         name = match.group(1)
-        samples = [23] if name == "AHI" else [10, 20]
+        # Day report fields carry exactly one sample per day (sleep_report.cpp
+        # rejects sample_count != 1); ONT/OFT hold per-day therapy sessions and
+        # legitimately return several.
+        if name in ("ONT", "OFT"):
+            samples = [8, 32]           # minutes of two therapy sessions
+        else:
+            samples = [23] if name == "AHI" else [10]
         value = "FFFF%02X%sFFFF" % (
             len(samples), "".join("%04X" % s for s in samples)
         )
