@@ -309,7 +309,6 @@
   "config.option.ui_theme.light": "Jasny",
   "config.option.wifi_mode.0": "Auto (STA + awaryjny AP)",
   "config.option.wifi_mode.1": "Tylko AP",
-  "config.option.wifi_mode.2": "Wyłączone",
   "config.option.wifi_mode.3": "Tylko STA",
   "config.option.wifi_mode.4": "Zawsze STA+AP",
   "config.option.wifi_roam.0": "Wyłączone",

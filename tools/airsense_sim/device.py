@@ -33,10 +33,36 @@ import frame as qf
 # Variable catalogue
 # ---------------------------------------------------------------------------
 
+# settings_defs.h writes some labels with C's adjacent-string concatenation to
+# stay ASCII-only: "Tube Temp (\xc2\xb0""C)". A pattern that matched the pieces
+# directly needs nested quantifiers, which backtracked catastrophically on the
+# 67-row table and hung load_catalog(). Instead the pieces are merged up front
+# by _join_adjacent_literals(), leaving a plain single-literal pattern.
+_C_STR = r'"(?:[^"\\]|\\.)*"'
 _CATALOG_ROW = re.compile(
-    r'\{\s*"([A-Z0-9]{3})"\s*,\s*"([^"]*)"\s*,\s*SET_(\w+)\s*,\s*'
-    r'(-?\d+)\s*,\s*(\d+)\s*,\s*(NULL|"[^"]*")\s*\}'
+    r'\{\s*"([A-Z0-9]{3})"\s*,\s*(' + _C_STR + r')\s*,\s*SET_(\w+)\s*,\s*'
+    r'(-?\d+)\s*,\s*(\d+)\s*,\s*(' + _C_STR + r'|NULL)\s*\}'
 )
+# A quote followed by optional whitespace and another quote can only be the
+# seam between two adjacent literals -- separate fields always keep their comma.
+_ADJACENT_LITERALS = re.compile(r'"\s*"')
+
+
+def _join_adjacent_literals(text: str) -> str:
+    """Collapse C adjacent string concatenation: '"a" "b"' -> '"ab"'."""
+    return _ADJACENT_LITERALS.sub("", text)
+
+
+def _c_string(literal: str) -> str:
+    """Join concatenated C string pieces and decode simple escapes."""
+    text = "".join(re.findall(r'"((?:[^"\\]|\\.)*)"', literal))
+    try:
+        # "\xc2\xb0" is UTF-8 for the degree sign: unescape to raw bytes
+        # first, then re-decode as UTF-8.
+        return (text.encode("latin-1", "ignore").decode("unicode_escape")
+                .encode("latin-1", "ignore").decode("utf-8"))
+    except (UnicodeDecodeError, UnicodeEncodeError, ValueError):
+        return text
 
 # Fallback when src/settings_defs.h is not reachable (e.g. tool copied out).
 _FALLBACK_VARS = {
@@ -92,10 +118,12 @@ def load_catalog(path: str | None = None) -> dict:
     variables = {}
     if path and os.path.isfile(path):
         with open(path, "r", encoding="utf-8", errors="replace") as source:
-            text = source.read()
-        for name, label, kind, _scale, _decimals, options in _CATALOG_ROW.findall(text):
+            text = _join_adjacent_literals(source.read())
+        for name, label_lit, kind, _scale, _decimals, options_lit in _CATALOG_ROW.findall(text):
+            label = _c_string(label_lit)
+            options = "" if options_lit == "NULL" else _c_string(options_lit)
             if kind == "ENUM":
-                labels = [x for x in options.strip('"').split(",") if x]
+                labels = [x for x in options.split(",") if x]
                 variables[name] = Variable(
                     name, label, "enum", value=0, maximum=max(0, len(labels) - 1),
                     width=2, options=labels,
@@ -130,19 +158,90 @@ STORED_TAGS = ("ABR", "TXC", "TXH", "TXE", "TXW", "TRR", "DLL", "ERR", "ELI", "Z
 
 # Custom-settings registry records (protocol version 02).
 # Pressure settings use 0.1 cmH2O resolution: scale=10, decimals=1, step=5 (=0.5 cmH2O).
+# MPA/MPI carry the "auto" mode mask 00000806 (bits 1,2,11 = AutoSet/APAP/
+# AutoSet Her): they are the APAP pressure pair, so they must not appear in
+# fixed-pressure modes. Both are delivered through the registry so they reach
+# the UI with their cmH2O unit -- the stock catalogue carries no units at all.
 CSG_RECORDS = (
     "V4 04 00000FFF IPC 000A 0005 01 05:cmH2O 01 03:Set Set Pressure",
-    "V4 00 00000FFF MPA 000A 0005 01 05:cmH2O 00 Max Pressure",
+    "V4 00 00000806 MPA 000A 0005 01 05:cmH2O 00 Max Pressure",
+    "V4 00 00000806 MPI 000A 0005 01 05:cmH2O 00 Min Pressure",
     "V8 02 00000FFF EBE 01 07:Comfort Easy-Breathe",
 )
 
-# Believable demo values for clinically meaningful pressure settings.
-# (raw value, raw minimum, raw maximum) -- the firmware divides by the CSG scale
-# (10) and formats to the CSG decimals (1) to obtain the displayed cmH2O figure.
-# MPA: 20.0 cmH2O, range 4.0-25.0 ; IPC: 8.0 cmH2O, range 4.0-20.0.
+# Believable demo values: (raw value, raw minimum, raw maximum) on the wire.
+# Displayed figure = raw / scale. For the two CSG-delivered vars (MPA/IPC) the
+# scale comes from the CSG records above (10); for every other numeric var it
+# comes from src/settings_defs.h (scale_div column). Without an entry here the
+# generic placeholder (value 100, range 0-1000) applies, which reads as absurd
+# pressures/timings after the firmware divides by the scale.
 DEMO_VALUES = {
-    "MPA": (200, 40, 250),
-    "IPC": (80, 40, 200),
+    # -- CSG-delivered pressures (scale 10) --------------------------------
+    "MPA": (200, 40, 250),        # 20.0 cmH2O, range 4.0-25.0
+    "MPI": (60, 40, 200),         # 6.0 cmH2O, range 4.0-20.0
+    "IPC": (80, 40, 200),         # 8.0 cmH2O, range 4.0-20.0
+    # -- native pressures (settings_defs.h scale 50) -----------------------
+    "IPP": (700, 200, 1250),      # 14.0 cmH2O, range 4.0-25.0
+    "EPP": (300, 200, 1000),      # 6.0 cmH2O, range 4.0-20.0
+    "MXI": (1000, 200, 1250),     # 20.0 cmH2O, range 4.0-25.0
+    "MNE": (300, 200, 1000),      # 6.0 cmH2O, range 4.0-20.0
+    "SPT": (200, 0, 500),         # 4.0 cmH2O pressure support, 0.0-10.0
+    "EEP": (300, 200, 1000),      # 6.0 cmH2O (ASV)
+    "EAI": (300, 200, 1000),      # 6.0 cmH2O min EPAP (ASVAuto)
+    "EAX": (600, 200, 1250),      # 12.0 cmH2O max EPAP (ASVAuto)
+    "EPI": (300, 200, 1000),      # 6.0 cmH2O (iVAPS)
+    "MNS": (150, 0, 500),         # 3.0 cmH2O min PS
+    "MXS": (500, 0, 750),         # 10.0 cmH2O max PS
+    "ANS": (150, 0, 500),         # 3.0 cmH2O min PS (ASVAuto)
+    "AXS": (500, 0, 750),         # 10.0 cmH2O max PS (ASVAuto)
+    "WPM": (250, 0, 1000),        # 5.0 cmH2O min PS (iVAPS)
+    "WPA": (750, 0, 1000),        # 15.0 cmH2O max PS (iVAPS)
+    # -- ramp (pressures scale 50, minutes integer) ------------------------
+    "STP": (200, 200, 1000),      # ramp start 4.0 cmH2O, range 4.0-20.0
+    "STU": (200, 200, 1000),
+    "EPS": (200, 200, 1000),
+    "STV": (200, 200, 1000),
+    "STE": (200, 200, 1000),
+    "EAS": (200, 200, 1000),
+    "IVS": (200, 200, 1000),
+    "RMT": (20, 0, 45),           # 20 min ramp time, 0-45
+    # -- EPR level (scale 50) ----------------------------------------------
+    "EPR": (100, 0, 150),         # EPR 2 (2.0 cmH2O relief), 0-3
+    # -- ventilation timing / targets ---------------------------------------
+    "BKR": (75, 50, 150),         # 15.0 bpm backup rate, 10.0-30.0 (scale 5)
+    "RRT": (75, 50, 150),         # 15.0 bpm resp rate
+    "IBR": (75, 50, 150),         # 15 bpm target patient rate
+    "ITN": (20, 15, 150),         # Ti min 0.40 s, 0.30-3.00 (scale 50)
+    "ITX": (150, 25, 200),        # Ti max 3.00 s, 0.50-4.00
+    "ITT": (75, 25, 200),         # Ti 1.50 s, 0.50-4.00
+    "RST": (300, 50, 900),        # 300 ms rise time
+    "WMV": (50, 20, 100),         # target Va 5.0 L/min, 2.0-10.0 (scale 10)
+    "PHT": (170, 100, 200),       # 170 cm patient height
+    # -- climate / accessories ----------------------------------------------
+    "HMS": (4, 1, 8),             # humidity level 4, 1-8
+    "HTS": (280, 160, 300),       # tube temp 28 C, 16-30 (scale 10)
+    "HTF": (820, 600, 860),       # tube temp 82 F, 60-86 (scale 10)
+    # -- alarms ---------------------------------------------------------------
+    "SPX": (88, 80, 95),          # low SpO2 alarm 88%, 80-95
+    "APX": (20, 10, 30),          # apnea alarm 20 s, 10-30
+    "LMA": (16, 8, 40),           # low MV alarm 2 L/min, 1-5 (scale 8)
+}
+
+# Believable default selections for enum settings (index into the options).
+# Without an entry the first option (usually "Off") applies, which makes the
+# comfort features look disabled in a demo.
+DEMO_ENUM_DEFAULTS = {
+    # Therapy mode must match the mode advertised in the live stream (AutoSet),
+    # otherwise the clinical page shows the CPAP layout while the dashboard
+    # reports AutoSet -- and the MPA/MPI pressure pair would be filtered out.
+    "MOP": 1,                     # AutoSet
+    "RMA": 1,                     # Ramp(延迟升压): On
+    "EPA": 1,                     # EPR(呼气释压)[临床]: On
+    "EPX": 1,                     # EPR(呼气释压)[患者]: On
+    "EPT": 1,                     # EPR type: Full Time (全时段)
+    "HMX": 1,                     # Humidity: On
+    "HTX": 1,                     # Tube heating: On
+    "CCO": 1,                     # Climate Control: Manual (HMS/HTS meaningful)
 }
 
 
@@ -160,6 +259,10 @@ class Device:
             if name in self.vars:
                 v = self.vars[name]
                 v.value, v.minimum, v.maximum = val, lo, hi
+        for name, idx in DEMO_ENUM_DEFAULTS.items():
+            v = self.vars.get(name)
+            if v is not None and v.kind == "enum" and idx <= v.maximum:
+                v.value = idx
         self.stream_period = stream_period
 
         self.rop = "0000"

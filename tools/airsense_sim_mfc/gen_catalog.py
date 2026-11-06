@@ -15,9 +15,13 @@ HERE = pathlib.Path(__file__).resolve().parent
 SOURCE = HERE.parent.parent / "src" / "settings_defs.h"
 OUTPUT = HERE / "VarCatalog.cpp"
 
+# settings_defs.h uses C adjacent-string concatenation for a few ASCII-only
+# labels ("Tube Temp (\xc2\xb0""C)"). Matching the pieces directly needs nested
+# quantifiers, which backtrack catastrophically; merge them up front instead.
+_JOIN = re.compile(r'"\s*"')
 ROW = re.compile(
-    r'\{\s*"([A-Z0-9]{3})"\s*,\s*"((?:[^"\\]|\\.)*)"\s*,\s*SET_(\w+)\s*,\s*'
-    r'-?\d+\s*,\s*\d+\s*,\s*(NULL|"(?:[^"\\]|\\.)*"(?:\s*"(?:[^"\\]|\\.)*")*)\s*\}',
+    r'\{\s*"([A-Z0-9]{3})"\s*,\s*("(?:[^"\\]|\\.)*")\s*,\s*SET_(\w+)\s*,\s*'
+    r'-?\d+\s*,\s*\d+\s*,\s*(NULL|"(?:[^"\\]|\\.)*")\s*\}',
     re.S,
 )
 STRING = re.compile(r'"((?:[^"\\]|\\.)*)"', re.S)
@@ -26,33 +30,39 @@ STRING = re.compile(r'"((?:[^"\\]|\\.)*)"', re.S)
 # without an established Chinese translation keep their original form.
 CN = {
     "IPC": "设定压力", "MPA": "最大压力", "MPI": "最小压力",
-    "IPP": "IPAP", "EPP": "EPAP", "MXI": "最大 IPAP", "MNE": "最小 EPAP",
-    "SPT": "压力支持", "EEP": "EPAP", "EAI": "最小 EPAP", "EAX": "最大 EPAP",
-    "EPI": "EPAP", "MNS": "最小 PS", "MXS": "最大 PS", "ANS": "最小 PS",
+    "IPP": "吸气相正压（IPAP）", "EPP": "呼气相正压（EPAP）",
+    "MXI": "最大吸气相正压（IPAP）", "MNE": "最小呼气相正压（EPAP）",
+    "SPT": "压力支持", "EEP": "呼气相正压（EPAP）",
+    "EAI": "最小呼气相正压（EPAP）", "EAX": "最大呼气相正压（EPAP）",
+    "EPI": "呼气相正压（EPAP）", "MNS": "最小 PS", "MXS": "最大 PS", "ANS": "最小 PS",
     "AXS": "最大 PS", "WPM": "最小 PS", "WPA": "最大 PS",
-    "BKR": "后备呼吸频率", "RRT": "呼吸频率",
-    "ITN": "最小 Ti", "ITX": "最大 Ti", "ITT": "Ti",
-    "RST": "压力上升时间", "IBR": "目标呼吸频率",
+    "BKR": "后备呼吸频率（BPM）", "RRT": "呼吸频率",
+    "ITN": "最小吸气时间（Ti）", "ITX": "最大吸气时间（Ti）", "ITT": "吸气时间（Ti）",
+    "RST": "压力上升时间（Rise Time）", "IBR": "目标呼吸频率",
     "EBE": "Easy-Breathe", "VTS": "触发灵敏度", "VCS": "切换灵敏度",
     "AFC": "Response", "WMV": "目标 Va", "PHT": "身高 (cm)",
-    "STP": "Ramp 起始压力", "STU": "Ramp 起始压力",
-    "EPS": "Ramp 起始 EPAP", "STV": "Ramp 起始 EPAP",
-    "STE": "Ramp 起始 EPAP", "EAS": "Ramp 起始 EPAP", "IVS": "Ramp 起始 EPAP",
-    "EPR": "EPR 等级", "EPA": "EPR", "EPX": "呼气压力释放（患者）",
-    "EPT": "EPR 类型", "RMA": "Ramp", "RMT": "Ramp 时间",
-    "ALR": "漏气报警", "SST": "SmartStart", "MSK": "面罩类型",
+    "STP": "Ramp(延迟升压) 起始压力", "STU": "Ramp(延迟升压) 起始压力",
+    "EPS": "Ramp(延迟升压) 起始 EPAP", "STV": "Ramp(延迟升压) 起始 EPAP",
+    "STE": "Ramp(延迟升压) 起始 EPAP", "EAS": "Ramp(延迟升压) 起始 EPAP",
+    "IVS": "Ramp(延迟升压) 起始 EPAP",
+    "EPR": "EPR(呼气释压) 等级", "EPA": "EPR(呼气释压)[临床]",
+    "EPX": "EPR(呼气释压)[患者]", "EPT": "EPR(呼气释压) 类型",
+    "RMA": "Ramp(延迟升压)", "RMT": "Ramp(延迟升压) 时间 (min)",
+    "ALR": "漏气报警", "SST": "智能启动", "MSK": "面罩类型",
     "TBT": "管路类型", "QFC": "飞行模式", "MOP": "治疗模式",
-    "CCO": "Climate Control", "HMS": "湿化等级", "HMX": "湿化",
-    "HTF": "管路温度 (F)", "HTS": "管路温度 (C)", "HTX": "管路加热",
+    "CCO": "温湿度控制", "HMS": "湿化等级", "HMX": "湿化",
+    "HTF": "管路温度 (°F)", "HTS": "管路温度 (°C)", "HTX": "管路加热",
     "LAN": "语言", "PRD": "压力单位", "TMU": "温度单位",
-    "ACC": "患者菜单 (Plus)", "ALV": "报警音量", "HLE": "高漏气报警",
+    "ACC": "[患者]菜单 (Plus)", "ALV": "报警音量", "HLE": "高漏气报警",
     "NMF": "Non-Vent 面罩", "SPX": "低 SpO2 报警",
     "APX": "呼吸暂停报警 (s)", "LMA": "低 MV 报警",
 }
 
 
 def literal(text: str) -> str:
-    text = text.replace("\\xc2\\xb0", "")
+    # "\xc2\xb0" is UTF-8 for the degree sign; keep the character, drop the
+    # escape so labels read "Tube Temp (°C)" instead of "Tube Temp (C)".
+    text = text.replace("\\xc2\\xb0", "\u00b0")
     text = text.replace('\\"', '"').replace("\\\\", "\\")
     return text.replace("\\", "\\\\").replace('"', '\\"').strip()
 
@@ -62,9 +72,10 @@ def cpp(text: str) -> str:
 
 
 def main() -> None:
-    source = SOURCE.read_text(encoding="utf-8", errors="replace")
+    source = _JOIN.sub("", SOURCE.read_text(encoding="utf-8", errors="replace"))
     rows = []
-    for name, label, kind, raw_options in ROW.findall(source):
+    for name, label_lit, kind, raw_options in ROW.findall(source):
+        label = "".join(STRING.findall(label_lit))
         options = "" if raw_options == "NULL" else "".join(STRING.findall(raw_options))
         cn = CN.get(name, literal(label))
         rows.append((name, literal(label), cn, kind == "ENUM", literal(options)))

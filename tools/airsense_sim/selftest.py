@@ -91,7 +91,13 @@ class CatalogTests(unittest.TestCase):
 
     def test_csg_records_shape(self):
         self.assertTrue(all(r.startswith(("V4 ", "V8 ")) for r in CSG_RECORDS))
-        self.assertEqual(len(CSG_RECORDS), 3)
+        # IPC, MPA, MPI (numerics) plus EBE (enum).
+        self.assertEqual(len(CSG_RECORDS), 4)
+        # Pressures must reach the UI with their unit: the stock catalogue has
+        # no unit column, so anything outside the registry renders unitless.
+        for record in CSG_RECORDS:
+            if record.split()[3] in ("IPC", "MPA", "MPI"):
+                self.assertIn("05:cmH2O", record)
 
     def test_csg_records_reference_matching_variable_types(self):
         # V4 needs a numeric G C #VAR ("F MIN MAX"); V8 needs enum flags ("F").
@@ -261,7 +267,7 @@ class EndToEndTests(unittest.TestCase):
         host_frames = qf.Parser().feed(link.host_read())
         self.assertEqual(len(host_frames), 4)
         self.assertTrue(all(f.crc_ok for f in host_frames))
-        self.assertEqual(host_frames[3].text, "G C &CSG = 02 03")
+        self.assertEqual(host_frames[3].text, "G C &CSG = 02 04")
 
     def test_firmware_startup_sequence_on_one_stream(self):
         """All frames AirBridge sends during poll + discovery + setup, at once."""

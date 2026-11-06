@@ -307,7 +307,6 @@
   "config.option.ui_theme.light": "Light",
   "config.option.wifi_mode.0": "Auto (STA + AP fallback)",
   "config.option.wifi_mode.1": "AP only",
-  "config.option.wifi_mode.2": "Off",
   "config.option.wifi_mode.3": "STA only",
   "config.option.wifi_mode.4": "STA+AP always",
   "config.option.wifi_roam.0": "Disabled",
