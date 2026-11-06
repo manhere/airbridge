@@ -19,7 +19,7 @@ Using an AirSense 11? See [AirCANnect](https://github.com/m-kozlowski/aircannect
 Follow the [Quick Start](docs/quickstart.md) to wire and flash your board.
 On a fresh installation, connect to its `airbridge_...` WiFi network
 (password `airbridge`), open `http://192.168.4.1/`, and complete the setup wizard.
-Default Web UI login: `admin` / `airbridge`.
+Default Web UI login: `admin` / `admin`.
 
 ## Related tools
 

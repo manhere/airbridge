@@ -24,7 +24,7 @@ struct AirBridgeConfig {
     uint8_t     wifi_net_count;     // populated slots
     uint8_t     wifi_mode;          // see WIFI_MODE_* in app_config.h
     bool        wifi_roam;          // hysteresis-based roaming
-    String      wifi_country;       // ISO 3166 country code, "01" = worldwide
+    String      wifi_country;       // ISO 3166-1 alpha-2 code, "01" = worldwide, "CN" = China
     uint16_t    tcp_port;
 
     bool        oxi_enabled;

@@ -52,7 +52,7 @@ pio run -e m5stamp-pico -t upload
 On a fresh installation, connect to the `airbridge_...` WiFi access point
 (password `airbridge`) and open `http://192.168.4.1/`.
 
-Log in with username `admin` and password `airbridge`. The setup wizard guides
+Log in with username `admin` and password `admin`. The setup wizard guides
 you through your WiFi network, AirSense connection, time, optional sync
 destinations, and Web UI credentials. Use **Save & next**, then **Finish**.
 You can reopen the wizard from **Config > Initial setup**.

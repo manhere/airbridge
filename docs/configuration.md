@@ -30,9 +30,9 @@ top-level WiFi-related config keys are:
 | Key | Default | Description |
 |-----|---------|-------------|
 | `hostname` | airbridge | DHCP and mDNS hostname, and AP SSID prefix |
-| `wifi_mode` | 1 | Operating mode, see table below |
+| `wifi_mode` | 0 | Operating mode, see table below |
 | `wifi_roam` | true | Roam automatically between saved networks |
-| `wifi_country` | 01 | ISO 3166 country code; "01" = worldwide |
+| `wifi_country` | CN | ISO 3166-1 alpha-2 country code; "01" = worldwide, "CN" = China |
 
 **`wifi_mode` values:**
 
@@ -55,9 +55,10 @@ With no saved networks, Auto and STA+AP modes provide an access point for
 setup. STA-only does not start an access point.
 
 The `wifi_country` key affects channel allocation and TX power limits per
-regulatory domain. Use a 2-letter ISO code (`US`, `DE`, `JP`, `PL`, ...) or
-`01` to use the worldwide-safe defaults. Bad values are rejected with a
-log warning and the previous setting stays in effect.
+regulatory domain. Use a 2-letter ISO 3166-1 alpha-2 code (`US`, `DE`, `JP`,
+`PL`, `CN` for China = ISO 3166-1 numeric 156, ...) or `01` for the
+worldwide-safe defaults. Bad values are rejected with a log warning and the
+previous setting stays in effect.
 
 ### Web UI
 
@@ -65,7 +66,7 @@ log warning and the previous setting stays in effect.
 |-----|---------|-------------|
 | `http_port` | 80 | Web server port |
 | `http_user` | admin | Web UI username |
-| `http_pass` | airbridge | Web UI password |
+| `http_pass` | admin | Web UI password |
 | `auth_whitelist` | *(empty)* | Trusted IPv4 addresses that bypass web login. Comma-separated addresses, CIDR networks, start-end ranges or `*`; maximum 160 characters |
 | `ui_language` | zh | Web UI language: `auto` follows browser preferences; `zh` selects Chinese (default); `en` selects English; `pl` selects Polish |
 | `ui_theme` | auto | Web UI theme: `auto` follows browser preferences; an available theme ID overrides them for all browsers. Default themes: `light`, `dark`; also selectable from the header button |
@@ -83,8 +84,8 @@ confirmation on the OTA tab.
 
 | Key | Default | Description |
 |-----|---------|-------------|
-| `ntp_server` | *(empty)* | NTP server address. Empty = use DHCP-provided server, or pool.ntp.org as fallback |
-| `tz` | UTC0 | POSIX timezone string (e.g. `CET-1CEST,M3.5.0,M10.5.0/3`) |
+| `ntp_server` | ntp.aliyun.com | NTP server address. Empty = use DHCP-provided server, or pool.ntp.org as fallback |
+| `tz` | CST-8 | POSIX timezone string (e.g. `CET-1CEST,M3.5.0,M10.5.0/3`) |
 | `resmed_time` | 1 | Automatically synchronize the ResMed clock from NTP while idle. `0` disables automatic synchronization; manual sync remains available |
 
 **Config > Time** includes a helper for detecting your browser's timezone.
@@ -116,7 +117,7 @@ only while therapy is inactive.
 
 | Key | Default | Description |
 |-----|---------|-------------|
-| `oxi_enabled` | true | Enable BLE oximeter support |
+| `oxi_enabled` | false | Enable BLE oximeter support |
 | `oxi_auto_start` | true | Start feeding data automatically on connect |
 | `oxi_feed_therapy_only` | false | Only inject readings during active therapy |
 | `oxi_interval_ms` | 500 | Injection interval in milliseconds |

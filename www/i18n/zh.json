@@ -272,7 +272,7 @@
   "config.help.ui_language": "Web 界面语言（auto 跟随浏览器偏好）",
   "config.help.ui_theme": "Web 界面主题（auto 跟随浏览器偏好）",
   "config.help.update_url": "发布清单 URL（留空禁用自动检查）",
-  "config.help.wifi_country": "ISO 3166 国家代码（01 = 全球）",
+  "config.help.wifi_country": "ISO 3166-1 国家代码（01 = 全球；中国 = CN / 156）",
   "config.help.wifi_mode": "工作模式",
   "config.help.wifi_roam": "启用迟滞漫游",
   "config.networks": "WiFi 网络",
