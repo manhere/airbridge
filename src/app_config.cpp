@@ -63,7 +63,7 @@ struct KVEntry {
 
 static const KVEntry kv_table[] = {
     KV_STR("hostname", "hostname", hostname, DEFAULT_HOSTNAME, Network),
-    KV_ENUM("wifi_mode", "wifi_mode", wifi_mode, WIFI_MODE_AUTO, Network, "0=Auto (STA + AP fallback)", "1=AP only", "2=Off", "3=STA only", "4=STA+AP always"),
+    KV_ENUM("wifi_mode", "wifi_mode", wifi_mode, WIFI_MODE_STA_AP, Network, "0=Auto (STA + AP fallback)", "1=AP only", "2=Off", "3=STA only", "4=STA+AP always"),
     KV_BOOL("wifi_roam", "wifi_roam", wifi_roam, true, Network),
     KV_STR("wifi_country", "wifi_country", wifi_country, "CN", Network),
     KV_U16("tcp_port", "tcp_port", tcp_port, CFG_DEFAULT_TCP_PORT, Uart),

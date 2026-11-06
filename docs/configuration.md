@@ -30,7 +30,7 @@ top-level WiFi-related config keys are:
 | Key | Default | Description |
 |-----|---------|-------------|
 | `hostname` | airbridge | DHCP and mDNS hostname, and AP SSID prefix |
-| `wifi_mode` | 0 | Operating mode, see table below |
+| `wifi_mode` | 4 | Operating mode, see table below |
 | `wifi_roam` | true | Roam automatically between saved networks |
 | `wifi_country` | CN | ISO 3166-1 alpha-2 country code; "01" = worldwide, "CN" = China |
 
