@@ -1,0 +1,18 @@
+# MSVC build outputs
+x64/
+Debug/
+Release/
+*.user
+*.ilk
+*.pdb
+*.tlog
+*.obj
+*.res
+*.idb
+*.recipe
+*.FileListAbsolute.txt
+.vs/
+
+# runtime artefacts
+selftest_result.txt
+*.log
