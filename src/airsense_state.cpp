@@ -76,8 +76,11 @@ static bool accept_identity_field(const char *tag, const char *text,
 
 static void accept_rop(const char *text, Arbiter::VarResult result,
                         const Arbiter::VarReadTrace &trace) {
+    // 0003 = Power Save（Web 状态页"省电"按钮写入，前端 status.rop.3 有完整支持）；
+    // 0004 = Calibration。其余 0005/0009 等为治疗结束后时钟同步态，不在此判定。
     airsense_present = result == Arbiter::VarResult::Ok &&
-        (!strcmp(text, "0000") || !strcmp(text, "0001") || !strcmp(text, "0004"));
+        (!strcmp(text, "0000") || !strcmp(text, "0001") ||
+         !strcmp(text, "0003") || !strcmp(text, "0004"));
     if (airsense_present) {
         consecutive_timeouts = 0;
         airsense_seen_ms = millis();
