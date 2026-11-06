@@ -38,7 +38,7 @@ CN = {
     "AXS": "最大 PS（压力支持）", "WPM": "最小 PS（压力支持）", "WPA": "最大 PS（压力支持）",
     "BKR": "后备呼吸频率（BPM）", "RRT": "呼吸频率",
     "ITN": "最小吸气时间（Ti）", "ITX": "最大吸气时间（Ti）", "ITT": "吸气时间（Ti）",
-    "RST": "压力上升时间（Rise Time）", "IBR": "目标呼吸频率",
+    "RST": "压力上升时间（Rise Time）", "IBR": "目标呼吸频率（BPM）",
     "EBE": "Easy-Breathe", "VTS": "触发灵敏度", "VCS": "切换灵敏度",
     "AFC": "Response", "WMV": "目标肺泡通气量（Va）", "PHT": "身高（cm）",
     "STP": "Ramp（延迟升压）起始压力", "STU": "Ramp（延迟升压）起始压力",

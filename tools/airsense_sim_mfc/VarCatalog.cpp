@@ -34,7 +34,7 @@ const RawVar kRawVars[] = {
     { "ITX", "Ti Max", "最大吸气时间（Ti）", false, "" },
     { "ITT", "Ti", "吸气时间（Ti）", false, "" },
     { "RST", "Rise Time (ms)", "压力上升时间（Rise Time）", false, "" },
-    { "IBR", "Target Pt Rate", "目标呼吸频率", false, "" },
+    { "IBR", "Target Pt Rate", "目标呼吸频率（BPM）", false, "" },
     { "EBE", "Easy-Breathe", "Easy-Breathe", true, "Off,On" },
     { "VTS", "Trigger Sens.", "触发灵敏度", true, "Very Low,Low,Med,High,Very High" },
     { "VCS", "Cycle Sens.", "切换灵敏度", true, "Very Low,Low,Med,High,Very High" },

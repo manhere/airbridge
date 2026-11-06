@@ -61,7 +61,7 @@
   "clinical.label.HTF": "管路温度（°F）",
   "clinical.label.HTS": "管路温度（°C）",
   "clinical.label.HTX": "管路加热",
-  "clinical.label.IBR": "目标呼吸频率",
+  "clinical.label.IBR": "目标呼吸频率（BPM）",
   "clinical.label.IPC": "设定压力",
   "clinical.label.IPP": "吸气相正压（IPAP）",
   "clinical.label.ITN": "最小吸气时间（Ti）",
