@@ -101,6 +101,7 @@
   "clinical.label.WPA": "Maksymalne PS",
   "clinical.label.WPM": "Minimalne PS",
   "clinical.notConnected": "Nie podłączono AirSense; ustawienia kliniczne niedostępne",
+  "clinical.metadataRetrying": "Ponowne wykrywanie metadanych ustawień, ponawianie…",
   "clinical.option.ACC.0": "Plus",
   "clinical.option.ACC.1": "Włączone",
   "clinical.option.AFC.0": "Standardowa",

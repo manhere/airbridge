@@ -101,6 +101,7 @@
   "clinical.label.WPA": "最大 PS",
   "clinical.label.WPM": "最小 PS",
   "clinical.notConnected": "未连接 AirSense，临床设置不可用",
+  "clinical.metadataRetrying": "设置元数据重新发现中，正在重试…",
   "clinical.option.ACC.0": "Plus",
   "clinical.option.ACC.1": "开启",
   "clinical.option.AFC.0": "标准",

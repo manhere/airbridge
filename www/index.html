@@ -3658,6 +3658,7 @@ async function settingsRequest(options, endpoint = '/api/settings', query = '') 
 
 let clinicalRead = null, clinicalGeneration = 0, clinicalSaving = false;
 let clinicalAwaitingDevice = false;
+let clinicalMetaRetries = 0;
 function clinicalDirty(except) {
   return Array.from(document.querySelectorAll('#p-clinical [data-cmd]')).some(
     inp => inp.dataset.cmd !== except && inp.value !== inp.dataset.orig);
@@ -3738,8 +3739,21 @@ function loadSettings(force = false) {
         }
       }
     });
+    clinicalMetaRetries = 0;
     return true;
-  } catch(e) { showMsg(msgEl, uiMessage('common.error', {detail:uiError(e)}), 'err'); return false; }
+  } catch(e) {
+    // Therapy transitions invalidate the CSG cache; rediscovery takes ~2 s and
+    // /api/settings answers settings_metadata_unavailable meanwhile. Retry a
+    // few times instead of surfacing the error, mirroring the notConnected path.
+    if (e?.message === 'settings_metadata_unavailable' &&
+        generation === clinicalGeneration && clinicalMetaRetries < 3) {
+      clinicalMetaRetries++;
+      showMsg(msgEl, uiMessage('clinical.metadataRetrying'), 'ok');
+      setTimeout(() => { if (generation === clinicalGeneration) loadSettings(true); }, 2000);
+      return false;
+    }
+    showMsg(msgEl, uiMessage('common.error', {detail:uiError(e)}), 'err'); return false;
+  }
   finally { if (spinner && generation === clinicalGeneration) spinner.style.display = 'none'; }
   })();
   const pending = clinicalRead;
