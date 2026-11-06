@@ -28,7 +28,7 @@ struct Snapshot {
     char oxi_name[32];
     uint32_t ip = 0;
     uint32_t ap_ip = 0;
-    char ui_language[16] = "auto";
+    char ui_language[16] = "zh";
     char ui_theme[32] = "auto";
     SleepReport::Source report_source = SleepReport::Source::Device;
     uint32_t report_revision = 0;

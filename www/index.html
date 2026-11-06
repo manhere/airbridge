@@ -953,7 +953,7 @@ a.btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 <script>
 const UI_CATALOGS = /* UI_CATALOGS */ {};
 let uiLanguage = null;
-let uiPluralRules = new Intl.PluralRules('en');
+let uiPluralRules = new Intl.PluralRules('zh');
 const uiFormatters = new Map();
 const uiBindings = new WeakMap();
 const UI_ATTRIBUTES = {'data-i18n':'textContent', 'data-i18n-title':'title',
@@ -966,7 +966,7 @@ function resolveUiLanguage(override) {
     const supported = Object.keys(UI_CATALOGS).find(language => language.toLowerCase() === tag) || tag.split('-')[0];
     if (Object.hasOwn(UI_CATALOGS, supported)) return supported;
   }
-  return 'en';
+  return 'zh';
 }
 
 function uiNumber(value, maximumFractionDigits = 2, minimumFractionDigits = 0) {
