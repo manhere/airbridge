@@ -36,7 +36,7 @@ CN = {
     "EAI": "最小呼气相正压（EPAP）", "EAX": "最大呼气相正压（EPAP）",
     "EPI": "呼气相正压（EPAP）", "MNS": "最小 PS（压力支持）", "MXS": "最大 PS（压力支持）", "ANS": "最小 PS（压力支持）",
     "AXS": "最大 PS（压力支持）", "WPM": "最小 PS（压力支持）", "WPA": "最大 PS（压力支持）",
-    "BKR": "后备呼吸频率（BPM）", "RRT": "呼吸频率",
+    "BKR": "后备呼吸频率（BPM）", "RRT": "呼吸频率（BPM）",
     "ITN": "最小吸气时间（Ti）", "ITX": "最大吸气时间（Ti）", "ITT": "吸气时间（Ti）",
     "RST": "压力上升时间（Rise Time）", "IBR": "目标呼吸频率（BPM）",
     "EBE": "Easy-Breathe", "VTS": "触发灵敏度", "VCS": "切换灵敏度",

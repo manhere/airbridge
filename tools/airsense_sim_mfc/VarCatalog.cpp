@@ -29,7 +29,7 @@ const RawVar kRawVars[] = {
     { "WPM", "Min PS", "最小 PS（压力支持）", false, "" },
     { "WPA", "Max PS", "最大 PS（压力支持）", false, "" },
     { "BKR", "Backup Rate", "后备呼吸频率（BPM）", false, "" },
-    { "RRT", "Resp. Rate", "呼吸频率", false, "" },
+    { "RRT", "Resp. Rate", "呼吸频率（BPM）", false, "" },
     { "ITN", "Ti Min", "最小吸气时间（Ti）", false, "" },
     { "ITX", "Ti Max", "最大吸气时间（Ti）", false, "" },
     { "ITT", "Ti", "吸气时间（Ti）", false, "" },

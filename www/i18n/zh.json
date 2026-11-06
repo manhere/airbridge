@@ -84,7 +84,7 @@
   "clinical.label.QFC": "飞行模式",
   "clinical.label.RMA": "Ramp（延迟升压）",
   "clinical.label.RMT": "Ramp（延迟升压）时间（min）",
-  "clinical.label.RRT": "呼吸频率",
+  "clinical.label.RRT": "呼吸频率（BPM）",
   "clinical.label.RST": "压力上升时间（Rise Time）",
   "clinical.label.SPT": "PS（压力支持）",
   "clinical.label.SPX": "低 SpO2 报警",
