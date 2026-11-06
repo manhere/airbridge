@@ -3577,8 +3577,7 @@ function renderField(s) {
   const div = document.createElement('div');
   div.className = 'row';
   const label = document.createElement('label');
-  if (s.source === 'custom') label.textContent = s.label + (s.units ? ' (' + s.units + ')' : '');
-  else uiText(label, uiMessage('common.value', {value:{items:[
+  uiText(label, uiMessage('common.value', {value:{items:[
     uiMessage('clinical.label.' + s.cmd, {}, s.label), s.units ? '(' + s.units + ')' : null
   ].filter(Boolean),separator:' '}}));
   div.appendChild(label);
@@ -3589,8 +3588,7 @@ function renderField(s) {
     options.forEach((o, i) => {
       const option = document.createElement('option');
       option.value = typeof o === 'object' ? o.value : i;
-      if (s.source === 'custom') option.textContent = typeof o === 'object' ? o.label : o;
-      else uiText(option, uiMessage('clinical.option.' + s.cmd + '.' + option.value, {}, typeof o === 'object' ? o.label : o));
+      uiText(option, uiMessage('clinical.option.' + s.cmd + '.' + option.value, {}, typeof o === 'object' ? o.label : o));
       select.appendChild(option);
     });
     select.value = String(s.value);

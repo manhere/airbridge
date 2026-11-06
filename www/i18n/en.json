@@ -482,6 +482,7 @@
   "error.remote_verify_failed": "Remote file verification failed",
   "error.rename_failed": "Rename failed",
   "error.report_day_unavailable": "This therapy date is not available.",
+  "error.report_day_mismatch": "Therapy day does not match the stored record.",
   "error.report_deadline": "The report request timed out.",
   "error.report_history_changed": "The device saved new data during this read. Refresh to read again.",
   "error.report_history_unsupported": "This firmware does not provide stored daily reports.",

@@ -350,7 +350,11 @@ std::vector<qf::Bytes> CSimDevice::CmdStoredValue(const std::string& command)
         return { Error(command, "6034") };
     std::string name = parts[2].substr(1);
     // 日报表字段每天恰好 1 个样本（sleep_report.cpp 拒绝 sample_count != 1）；
-    // ONT/OFT 是每天多次治疗时段，合法返回多个。
+    // ONT/OFT 是每天多次治疗时段，合法返回多个。LSD（最近治疗日）必须把被查询的
+    // 日原样回送为唯一样本，否则 sleep_report.cpp:123 会以 report_day_mismatch
+    // 判整个报告失败，治疗数据因此无法测试。
+    if (name == "LSD")
+        return { Reply(command, "FFFF01" + parts[3] + "FFFF") };
     std::vector<int> samples;
     if (name == "ONT" || name == "OFT")      samples = { 8, 32 };
     else if (name == "AHI")                  samples = { 23 };

@@ -426,10 +426,15 @@ class Device:
         if not match:
             return [self._error(command, "6034")]
         name = match.group(1)
+        day = int(match.group(2), 16)
         # Day report fields carry exactly one sample per day (sleep_report.cpp
         # rejects sample_count != 1); ONT/OFT hold per-day therapy sessions and
-        # legitimately return several.
-        if name in ("ONT", "OFT"):
+        # legitimately return several. LSD (last sleep day) must echo the queried
+        # day back as its single sample, otherwise sleep_report.cpp:123 fails the
+        # whole report with report_day_mismatch and therapy data is untestable.
+        if name == "LSD":
+            samples = [day & 0xFFFF]
+        elif name in ("ONT", "OFT"):
             samples = [8, 32]           # minutes of two therapy sessions
         else:
             samples = [23] if name == "AHI" else [10]

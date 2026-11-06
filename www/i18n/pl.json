@@ -484,6 +484,7 @@
   "error.remote_verify_failed": "Weryfikacja zdalnego pliku nie powiodła się",
   "error.rename_failed": "Nie udało się zmienić nazwy",
   "error.report_day_unavailable": "Ta data terapii jest niedostępna.",
+  "error.report_day_mismatch": "Dzień terapii nie zgadza się z zapisanym.",
   "error.report_deadline": "Przekroczono czas oczekiwania na raport.",
   "error.report_history_changed": "Urządzenie zapisało nowe dane podczas odczytu. Odśwież, aby odczytać ponownie.",
   "error.report_history_unsupported": "Ten firmware nie udostępnia zapisanych raportów dziennych.",
