@@ -24,6 +24,7 @@ struct Snapshot {
     int mhr;
     int mop;
     bool feeding;
+    bool airsense_present = false;
     char oxi_source[32];
     char oxi_name[32];
     uint32_t ip = 0;
@@ -54,6 +55,7 @@ inline Snapshot snapshot() {
     out.mhr = AirSenseState::mhr();
     out.mop = out.sys == SYS_IDLE || out.sys == SYS_THERAPY
         ? AirSenseState::mop() : -1;
+    out.airsense_present = AirSenseState::present_recently();
     out.feeding = OxiArbiter::is_feeding();
     OxiArbiter::get_source(out.oxi_source, sizeof(out.oxi_source),
                            out.oxi_name, sizeof(out.oxi_name));

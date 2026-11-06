@@ -1690,6 +1690,11 @@ function updateWifiBars(el, rssi) {
 }
 
 function renderStatus(d) {
+  if (clinicalAwaitingDevice && d.airsense_present === true &&
+      document.getElementById('p-clinical')?.classList.contains('active')) {
+    clinicalAwaitingDevice = false;
+    loadSettings(true);
+  }
   if (d.clinical_revision !== undefined && d.clinical_revision !== clinicalRevision) {
     clinicalRevision = d.clinical_revision;
     wakeClinicalRequests();
@@ -3652,6 +3657,7 @@ async function settingsRequest(options, endpoint = '/api/settings', query = '') 
 }
 
 let clinicalRead = null, clinicalGeneration = 0, clinicalSaving = false;
+let clinicalAwaitingDevice = false;
 function clinicalDirty(except) {
   return Array.from(document.querySelectorAll('#p-clinical [data-cmd]')).some(
     inp => inp.dataset.cmd !== except && inp.value !== inp.dataset.orig);
@@ -3662,6 +3668,14 @@ function loadSettings(force = false) {
   if (clinicalSaving && !force) return Promise.resolve(false);
   if (!force && clinicalDirty() && !confirm(t('clinical.unsavedRefresh')))
     return Promise.resolve(false);
+  // The settings registry is read from the AirSense over UART; without it the
+  // request can only fail with settings_metadata_unavailable.
+  if (lastStatus.airsense_present === false) {
+    clinicalAwaitingDevice = true;
+    showMsg(document.getElementById('clinicalMsg'), uiMessage('clinical.notConnected'), 'ok');
+    return Promise.resolve(false);
+  }
+  clinicalAwaitingDevice = false;
   const generation = ++clinicalGeneration;
   const fields = Array.from(document.querySelectorAll('#p-clinical [data-cmd]'));
   const values = fields.map(inp => inp.value);

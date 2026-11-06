@@ -152,8 +152,8 @@ static void sync_ntp() {
 #if LWIP_DHCP_GET_NTP_SRV
         esp_sntp_servermode_dhcp(true);
 #endif
-        esp_sntp_setservername(0, "pool.ntp.org");
-        Log::logf(CAT_TIME, LOG_DEBUG, "NTP: DHCP + pool.ntp.org fallback\n");
+        esp_sntp_setservername(0, "ntp.aliyun.com");
+        Log::logf(CAT_TIME, LOG_DEBUG, "NTP: DHCP + ntp.aliyun.com fallback\n");
     }
     esp_sntp_init();
 }

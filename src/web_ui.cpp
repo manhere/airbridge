@@ -476,6 +476,7 @@ static void appendStatusFields(Output &json, const DeviceStatus::Snapshot &statu
         jsonAddInt(json, "rssi", WiFiSetup::current_rssi());
         appendWifiAddresses(json, status.ip, status.ap_ip);
         jsonAddInt(json, "uptime", millis() / 1000);
+        jsonAddBool(json, "airsense_present", status.airsense_present);
     }
     if (fields & STATUS_STORAGE) {
         const auto &sd = status.storage;
@@ -2870,7 +2871,8 @@ static uint16_t statusChanges(const DeviceStatus::Snapshot &a,
     uint16_t fields = 0;
     if (a.rop != b.rop || a.sys != b.sys || a.mhr != b.mhr || a.mop != b.mop)
         fields |= STATUS_THERAPY;
-    if (a.ip != b.ip || a.ap_ip != b.ap_ip) fields |= STATUS_HEALTH;
+    if (a.ip != b.ip || a.ap_ip != b.ap_ip ||
+        a.airsense_present != b.airsense_present) fields |= STATUS_HEALTH;
     if (strcmp(a.ui_language, b.ui_language) || strcmp(a.ui_theme, b.ui_theme))
         fields |= STATUS_CONFIG;
     if (a.oxi != b.oxi || a.feeding != b.feeding ||

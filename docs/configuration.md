@@ -84,7 +84,7 @@ confirmation on the OTA tab.
 
 | Key | Default | Description |
 |-----|---------|-------------|
-| `ntp_server` | ntp.aliyun.com | NTP server address. Empty = use DHCP-provided server, or pool.ntp.org as fallback |
+| `ntp_server` | ntp.aliyun.com | NTP server address. Empty = use DHCP-provided server, or ntp.aliyun.com as fallback |
 | `tz` | CST-8 | POSIX timezone string (e.g. `CET-1CEST,M3.5.0,M10.5.0/3`) |
 | `resmed_time` | 1 | Automatically synchronize the ResMed clock from NTP while idle. `0` disables automatic synchronization; manual sync remains available |
 
