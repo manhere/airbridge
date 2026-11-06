@@ -155,7 +155,9 @@ class Device:
             "MID": "0028",
             "VID": "0402",
             "STK": "00000001",
-            "MHR": "04D2",
+            # Motor runtime in seconds (firmware divides by 3600 -> hours).
+            # 0x0112A880 = 18,000,000 s = 5000 h, a believable used-machine figure.
+            "MHR": "0112A880",
             "BLS": "0000",
             "SSD": "%04X" % self._therapy_day(),
             "ZEN": "0001",
