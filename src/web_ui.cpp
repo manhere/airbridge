@@ -1892,7 +1892,7 @@ static void handleBleAction(AsyncWebServerRequest *request) {
         return;
     }
 
-    String result = "unknown action";
+    String result = "invalid_action";
     bool ok = false;
 
     if (action == "scan") {
@@ -1913,11 +1913,11 @@ static void handleBleAction(AsyncWebServerRequest *request) {
         ok = true;
     } else if (action == "autoconnect") {
         if (enabled != "true" && enabled != "false") {
-            request->send(400, "application/json", "{\"error\":\"enabled must be true or false\"}");
+            request->send(400, "application/json", "{\"error\":\"invalid_enabled_value\"}");
             return;
         }
         ok = OxiBle::set_autoconnect(addr.c_str(), enabled == "true");
-        result = ok ? "autoconnect saved" : "unknown sensor or settings write failed";
+        result = ok ? "autoconnect saved" : "autoconnect_failed";
     } else if (action == "disconnect") {
         OxiBle::disconnect();
         result = "disconnected";
@@ -2057,7 +2057,7 @@ static void handleCmd(AsyncWebServerRequest *request) {
     aircannect::JsonAllocator allocator;
     JsonDocument doc(&allocator);
     if (!parseJsonObject(body, doc) || !doc["cmd"].is<const char *>()) {
-        request->send(400, "application/json", "{\"ok\":false,\"error\":\"missing cmd\"}");
+        request->send(400, "application/json", "{\"ok\":false,\"error\":\"missing_cmd\"}");
         return;
     }
     String cmd = doc["cmd"].as<const char *>();
@@ -2430,22 +2430,22 @@ static void handleWifiPost(AsyncWebServerRequest *request) {
         return;
     }
 
-    String result = "unknown action";
+    String result = "invalid_action";
     bool ok = false;
 
     if (action == "add") {
         if (ssid.length() > 0) {
             ok = Config::add_network(ssid.c_str(), pass.c_str());
-            result = ok ? "network added" : "list full or NVS save failed";
+            result = ok ? "network added" : "network_add_failed";
         } else {
-            result = "ssid required";
+            result = "ssid_required";
         }
     } else if (action == "remove") {
         if (idx >= 0) {
             ok = Config::remove_network((uint8_t)idx);
-            result = ok ? "network removed" : "invalid index or NVS save failed";
+            result = ok ? "network removed" : "network_remove_failed";
         } else {
-            result = "idx required";
+            result = "idx_required";
         }
     } else if (action == "update") {
         auto &cfg = Config::get();
@@ -2453,9 +2453,9 @@ static void handleWifiPost(AsyncWebServerRequest *request) {
             if (ssid.length() > 0) cfg.wifi_nets[idx].ssid = ssid;
             if (wctx.pass_set) cfg.wifi_nets[idx].pass = pass;
             ok = Config::save_wifi_nets();
-            result = ok ? "network updated" : "NVS save failed";
+            result = ok ? "network updated" : "nvs_save_failed";
         } else {
-            result = "invalid index";
+            result = "invalid_index";
         }
     }
 
@@ -2522,7 +2522,7 @@ static void handleTimeAction(AsyncWebServerRequest *request) {
         return;
     }
 
-    String result = "unknown action";
+    String result = "invalid_action";
     bool ok = false;
 
     if (action == "ntp_sync") {
@@ -2535,7 +2535,7 @@ static void handleTimeAction(AsyncWebServerRequest *request) {
         result = "ResMed clock sync requested";
     } else if (action == "sync_from_resmed") {
         ok = Air10Clock::pull_time(true);
-        result = ok ? "ESP32 clock set from ResMed" : "Failed to read ResMed clock";
+        result = ok ? "ESP32 clock set from ResMed" : "resmed_clock_read_failed";
     }
 
     String json = "{";
@@ -2653,7 +2653,7 @@ static void handleStorageUsb(AsyncWebServerRequest *request) {
     const String enabled = request->hasParam("enabled", true)
         ? request->getParam("enabled", true)->value() : "";
     if (enabled != "0" && enabled != "1") {
-        request->send(400, "application/json", "{\"error\":\"enabled must be 0 or 1\"}");
+        request->send(400, "application/json", "{\"error\":\"invalid_enabled_value\"}");
         return;
     }
     const char *error = nullptr;
