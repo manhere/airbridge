@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "SimDevice.h"
 #include "VarCatalog.h"
+#include <array>
 #include <ctime>
 
 namespace {
@@ -59,10 +60,20 @@ const std::vector<std::string> kStoredTags = {
 
 // Custom settings registry, protocol version 02. V4 records must reference
 // numeric variables (the firmware queries G C #VAR for their limits).
+// Pressure settings use 0.1 cmH2O resolution: scale=10, decimals=1, step=5 (=0.5 cmH2O).
 const std::vector<std::string> kCsgRecords = {
-    "V4 04 00000FFF IPC 0032 0001 01 05:cmH2O 01 03:Set Set Pressure",
-    "V4 00 00000FFF MPA 0001 0001 00 05:cmH2O 00 Max Pressure",
+    "V4 04 00000FFF IPC 000A 0005 01 05:cmH2O 01 03:Set Set Pressure",
+    "V4 00 00000FFF MPA 000A 0005 01 05:cmH2O 00 Max Pressure",
     "V8 02 00000FFF EBE 01 07:Comfort Easy-Breathe",
+};
+
+// Believable demo values for clinically meaningful pressure settings:
+// (raw value, raw minimum, raw maximum). The firmware divides by the CSG scale
+// (10) and formats to the CSG decimals (1) to obtain the displayed cmH2O figure.
+// MPA: 20.0 cmH2O, range 4.0-25.0 ; IPC: 8.0 cmH2O, range 4.0-20.0.
+const std::map<std::string, std::array<int, 3>> kDemoValues = {
+    { "MPA", { 200, 40, 250 } },
+    { "IPC", { 80, 40, 200 } },
 };
 
 } // namespace
@@ -79,8 +90,15 @@ CSimDevice::CSimDevice()
             state.width = 2;
         } else {
             state.value = 100;
+            state.minimum = 0;
             state.maximum = 1000;
             state.width = 4;
+            auto demo = kDemoValues.find(def.name);
+            if (demo != kDemoValues.end()) {
+                state.value = demo->second[0];
+                state.minimum = demo->second[1];
+                state.maximum = demo->second[2];
+            }
         }
         m_vars[def.name] = state;
     }
@@ -288,7 +306,7 @@ std::vector<qf::Bytes> CSimDevice::CmdCaps(const std::string& command)
 
     if (!indexed) {
         if (var->second.isEnum) return { Reply(command, "7") };
-        return { Reply(command, "7 " + qf::ToUpperHex(0, var->second.width)
+        return { Reply(command, "7 " + qf::ToUpperHex(static_cast<unsigned>(var->second.minimum), var->second.width)
                                  + " " + qf::ToUpperHex(static_cast<unsigned>(var->second.maximum), var->second.width)) };
     }
 

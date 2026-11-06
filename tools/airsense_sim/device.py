@@ -129,11 +129,21 @@ SCHEMAS = {
 STORED_TAGS = ("ABR", "TXC", "TXH", "TXE", "TXW", "TRR", "DLL", "ERR", "ELI", "ZRL")
 
 # Custom-settings registry records (protocol version 02).
+# Pressure settings use 0.1 cmH2O resolution: scale=10, decimals=1, step=5 (=0.5 cmH2O).
 CSG_RECORDS = (
-    "V4 04 00000FFF IPC 0032 0001 01 05:cmH2O 01 03:Set Set Pressure",
-    "V4 00 00000FFF MPA 0001 0001 00 05:cmH2O 00 Max Pressure",
+    "V4 04 00000FFF IPC 000A 0005 01 05:cmH2O 01 03:Set Set Pressure",
+    "V4 00 00000FFF MPA 000A 0005 01 05:cmH2O 00 Max Pressure",
     "V8 02 00000FFF EBE 01 07:Comfort Easy-Breathe",
 )
+
+# Believable demo values for clinically meaningful pressure settings.
+# (raw value, raw minimum, raw maximum) -- the firmware divides by the CSG scale
+# (10) and formats to the CSG decimals (1) to obtain the displayed cmH2O figure.
+# MPA: 20.0 cmH2O, range 4.0-25.0 ; IPC: 8.0 cmH2O, range 4.0-20.0.
+DEMO_VALUES = {
+    "MPA": (200, 40, 250),
+    "IPC": (80, 40, 200),
+}
 
 
 # ---------------------------------------------------------------------------
@@ -146,6 +156,10 @@ class Device:
         self.scenario = scenario
         self.faults = faults or {}
         self.vars = load_catalog(catalog_path)
+        for name, (val, lo, hi) in DEMO_VALUES.items():
+            if name in self.vars:
+                v = self.vars[name]
+                v.value, v.minimum, v.maximum = val, lo, hi
         self.stream_period = stream_period
 
         self.rop = "0000"

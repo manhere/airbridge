@@ -28,6 +28,7 @@ struct DeviceStats {
 struct VarState {
     bool isEnum = false;
     int value = 100;
+    int minimum = 0;
     int maximum = 1000;
     int width = 4;
     std::vector<std::string> options;
