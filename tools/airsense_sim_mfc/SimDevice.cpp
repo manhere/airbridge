@@ -60,7 +60,7 @@ const std::vector<std::string> kStoredTags = {
 // Custom settings registry, protocol version 02. V4 records must reference
 // numeric variables (the firmware queries G C #VAR for their limits).
 const std::vector<std::string> kCsgRecords = {
-    "V4 04 00000FFF IPC 0032 0001 01 06:cmH2O 01 03:Set Set Pressure",
+    "V4 04 00000FFF IPC 0032 0001 01 05:cmH2O 01 03:Set Set Pressure",
     "V4 00 00000FFF MPA 0001 0001 00 00: 00 Max Pressure",
     "V8 02 00000FFF EBE 01 07:Comfort Easy-Breathe",
 };
