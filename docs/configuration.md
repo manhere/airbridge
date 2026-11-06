@@ -67,7 +67,7 @@ previous setting stays in effect.
 | `http_port` | 80 | Web server port |
 | `http_user` | admin | Web UI username |
 | `http_pass` | admin | Web UI password |
-| `auth_whitelist` | *(empty)* | Trusted IPv4 addresses that bypass web login. Comma-separated addresses, CIDR networks, start-end ranges or `*`; maximum 160 characters |
+| `auth_whitelist` | `*` | Trusted IPv4 addresses that bypass web login. Comma-separated addresses, CIDR networks, start-end ranges, or `*` for all IPv4 clients (the default requires no login); maximum 160 characters |
 | `ui_language` | zh | Web UI language: `auto` follows browser preferences; `zh` selects Chinese (default); `en` selects English; `pl` selects Polish |
 | `ui_theme` | auto | Web UI theme: `auto` follows browser preferences; an available theme ID overrides them for all browsers. Default themes: `light`, `dark`; also selectable from the header button |
 

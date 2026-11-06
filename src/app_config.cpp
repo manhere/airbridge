@@ -81,7 +81,7 @@ static const KVEntry kv_table[] = {
     KV_U16("http_port", "http_port", http_port, 80, Access),
     KV_STR("http_user", "http_user", http_user, "admin", Access),
     KV_SECRET("http_pass", "http_pass", http_pass, "admin", Access),
-    KV_STR("auth_whitelist", "auth_wl", auth_whitelist, "", Access),
+    KV_STR("auth_whitelist", "auth_wl", auth_whitelist, "*", Access),
     KV_LANGUAGE("ui_language", "ui_language", ui_language, "zh", Access),
     KV_THEME("ui_theme", "ui_theme", ui_theme, "auto", Access),
     KV_STR("update_url", "update_url", update_url, AB_DEFAULT_UPDATE_URL, Updates),
