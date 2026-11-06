@@ -108,6 +108,10 @@
 #endif
 #elif defined(AB_BOARD_WAVESHARE_ESP32_S3_GEEK)
 #define AB_OTA_RELEASE_TARGET "waveshare-esp32-s3-geek"
+// Must precede AB_BOARD_WROOM_S3: the no-SD DevKitC shares that board macro,
+// but its release manifest key is its own PlatformIO environment name.
+#elif defined(AB_BOARD_ESP32S3_DEVKITC_N16R8_NOSD)
+#define AB_OTA_RELEASE_TARGET "esp32s3-devkitc-n16r8-nosd"
 #elif defined(AB_BOARD_WROOM_S3)
 #define AB_OTA_RELEASE_TARGET "wroom-s3-n16r8-sdmmc4"
 #elif defined(AB_BOARD_XIAO_ESP32S3_PLUS) && AB_STORAGE_SDMMC_ENABLED

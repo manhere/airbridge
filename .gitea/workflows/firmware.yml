@@ -60,8 +60,11 @@ jobs:
 
       - name: Build firmware artifacts
         run: |
+          # Only release the DevKitC N16R8 (no SD) target. Without --env the
+          # script builds DEFAULT_ENVIRONMENTS, which does not include it.
           .ci-venv/bin/python python/tools/build_release.py \
             --pio .ci-venv/bin/pio \
+            --env esp32s3-devkitc-n16r8-nosd \
             --output dist
 
       - name: Build release notes
